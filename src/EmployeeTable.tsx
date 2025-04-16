@@ -1,137 +1,182 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { Table, Button, Space, Modal, Form, Input, InputNumber } from 'antd';
 
-type Employee = {
-  id: number;
+type Client = {
+  key: string;
   firstName: string;
   lastName: string;
   age: number;
-  position: string;
+  address: string;
 };
 
-const STORAGE_KEY = 'employees';
+const initialData: Client[] = [
+  {
+    key: '1',
+    firstName: 'Ivan',
+    lastName: 'Petrenko',
+    age: 30,
+    address: 'Kyiv, Ukraine',
+  },
+  {
+    key: '2',
+    firstName: 'Olena',
+    lastName: 'Shevchenko',
+    age: 25,
+    address: 'Lviv, Ukraine',
+  },
+  {
+    key: '3',
+    firstName: 'Taras',
+    lastName: 'Koval',
+    age: 40,
+    address: 'Odesa, Ukraine',
+  },
+  {
+    key: '4',
+    firstName: 'Nadia',
+    lastName: 'Kravchenko',
+    age: 35,
+    address: 'Kharkiv, Ukraine',
+  },
+  {
+    key: '5',
+    firstName: 'Andriy',
+    lastName: 'Bondar',
+    age: 28,
+    address: 'Dnipro, Ukraine',
+  },
+  {
+    key: '6',
+    firstName: 'Svitlana',
+    lastName: 'Maksymenko',
+    age: 33,
+    address: 'Vinnytsia, Ukraine',
+  },
+];
 
-const EmployeeTable: React.FC = () => {
-  const [employees, setEmployees] = useState<{ [key: number]: Employee }>({});
-  const [newEmployee, setNewEmployee] = useState<Employee>({
-    id: 0, firstName: '', lastName: '', age: 0, position: '',
-  });
+const ClientTable: React.FC = () => {
+  const [clients, setClients] = useState<Client[]>(initialData);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [form] = Form.useForm();
 
+  const handleEdit = (client: Client) => {
+    setEditingClient(client);
+    setIsModalOpen(true);
+    form.setFieldsValue(client); 
+  };
 
-  useEffect(() => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      const parsedData = JSON.parse(data);
-      if (parsedData && typeof parsedData === 'object') {
-        setEmployees(parsedData);
+  const handleDelete = (key: string) => {
+    setClients(prev => prev.filter(client => client.key !== key));
+  };
+
+  const handleModalOk = () => {
+    form.validateFields().then(values => {
+      if (editingClient) {
+        setClients(prev =>
+          prev.map(client =>
+            client.key === editingClient.key ? { ...editingClient, ...values } : client
+          )
+        );
       } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({}));
+        const newClient: Client = {
+          key: Date.now().toString(),
+          ...values,
+        };
+        setClients(prev => [...prev, newClient]);
       }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (Object.keys(employees).length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(employees));
-    }
-  }, [employees]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewEmployee({ ...newEmployee, [e.target.name]: e.target.value });
-  };
-
-  const addEmployee = () => {
-    if (!newEmployee.firstName || !newEmployee.lastName || !newEmployee.position) return;
-
-    const nextId = Math.max(0, ...Object.keys(employees).map((key) => Number(key))) + 1;
-    const newEmployeeWithId = { ...newEmployee, id: nextId, age: Number(newEmployee.age) };
-
-    setEmployees({
-      ...employees,
-      [nextId]: newEmployeeWithId,
-    });
-
-    setNewEmployee({ id: 0, firstName: '', lastName: '', age: 0, position: '' });
-  };
-
-  const deleteEmployee = (id: number) => {
-    const updatedEmployees = { ...employees };
-    delete updatedEmployees[id];
-    setEmployees(updatedEmployees);
-  };
-
-  const updateEmployee = (id: number, key: keyof Employee, value: string) => {
-    setEmployees({
-      ...employees,
-      [id]: { ...employees[id], [key]: key === 'age' ? Number(value) : value },
+      setIsModalOpen(false);
+      form.resetFields();
+      setEditingClient(null);
     });
   };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+    form.resetFields();
+    setEditingClient(null);
+  };
+
+  const columns = [
+    {
+      title: 'First Name',
+      dataIndex: 'firstName',
+      key: 'firstName',
+    },
+    {
+      title: 'Last Name',
+      dataIndex: 'lastName',
+      key: 'lastName',
+    },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+      key: 'age',
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: Client) => (
+        <Space>
+          <Button type="link" onClick={() => handleEdit(record)}>Edit</Button>
+          <Button danger type="link" onClick={() => handleDelete(record.key)}>Delete</Button>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2>📋 Працівники</h2>
-      <table border={1} cellPadding={8}>
-        <thead>
-          <tr>
-            <th>Прізвище</th>
-            <th>Ім'я</th>
-            <th>Вік</th>
-            <th>Посада</th>
-            <th>Дії</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(employees).length > 0 ? (
-            Object.keys(employees).map((key) => {
-              const emp = employees[Number(key)];
-              return (
-                <tr key={emp.id}>
-                  <td>
-                    <input
-                      value={emp.lastName}
-                      onChange={e => updateEmployee(emp.id, 'lastName', e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      value={emp.firstName}
-                      onChange={e => updateEmployee(emp.id, 'firstName', e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      value={emp.age}
-                      onChange={e => updateEmployee(emp.id, 'age', e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      value={emp.position}
-                      onChange={e => updateEmployee(emp.id, 'position', e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <button onClick={() => deleteEmployee(emp.id)}>🗑️ Видалити</button>
-                  </td>
-                </tr>
-              );
-            })
-          ) : (
-            <tr>
-              <td colSpan={5}>Працівників немає.</td>
-            </tr>
-          )}
-          <tr>
-            <td><input name="lastName" value={newEmployee.lastName} onChange={handleInputChange} /></td>
-            <td><input name="firstName" value={newEmployee.firstName} onChange={handleInputChange} /></td>
-            <td><input name="age" type="number" value={newEmployee.age || ''} onChange={handleInputChange} /></td>
-            <td><input name="position" value={newEmployee.position} onChange={handleInputChange} /></td>
-            <td><button onClick={addEmployee}>➕ Додати</button></td>
-          </tr>
-        </tbody>
-      </table>
+      <Button
+        type="primary"
+        style={{ marginBottom: '16px' }}
+        onClick={() => {
+          setEditingClient(null);
+          form.resetFields();
+          setIsModalOpen(true);
+        }}
+      >
+        Add Client
+      </Button>
+
+      <Table
+        dataSource={clients}
+        columns={columns}
+        pagination={{ pageSize: 3 }}
+      />
+
+      <Modal
+        title={editingClient ? 'Edit Client' : 'Add Client'}
+        open={isModalOpen}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Save"
+      >
+        <Form
+          form={form}
+          layout="vertical"
+        >
+          <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="age" label="Age" rules={[{ required: true }]}>
+            <InputNumber min={0} style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="address" label="Address" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
 
-export default EmployeeTable;
+export default ClientTable;
