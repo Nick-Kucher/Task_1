@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { Table, Button, Space, Modal, Form, Input, InputNumber } from 'antd';
+import './Table.css';
+import React, { useState } from 'react'
+import { Table, Button, Space, Modal, Form, Input, InputNumber } from 'antd'
 
 type Client = {
-  key: string;
-  firstName: string;
-  lastName: string;
-  age: number;
-  address: string;
-};
+  key: string,
+  firstName: string,
+  lastName: string,
+  age: number,
+  address: string
+}
 
 const initialData: Client[] = [
   {
@@ -15,60 +16,60 @@ const initialData: Client[] = [
     firstName: 'Ivan',
     lastName: 'Petrenko',
     age: 30,
-    address: 'Kyiv, Ukraine',
+    address: 'Kyiv, Ukraine'
   },
   {
     key: '2',
     firstName: 'Olena',
     lastName: 'Shevchenko',
     age: 25,
-    address: 'Lviv, Ukraine',
+    address: 'Lviv, Ukraine'
   },
   {
     key: '3',
     firstName: 'Taras',
     lastName: 'Koval',
     age: 40,
-    address: 'Odesa, Ukraine',
+    address: 'Odesa, Ukraine'
   },
   {
     key: '4',
     firstName: 'Nadia',
     lastName: 'Kravchenko',
     age: 35,
-    address: 'Kharkiv, Ukraine',
+    address: 'Kharkiv, Ukraine'
   },
   {
     key: '5',
     firstName: 'Andriy',
     lastName: 'Bondar',
     age: 28,
-    address: 'Dnipro, Ukraine',
+    address: 'Dnipro, Ukraine'
   },
   {
     key: '6',
     firstName: 'Svitlana',
     lastName: 'Maksymenko',
     age: 33,
-    address: 'Vinnytsia, Ukraine',
-  },
-];
+    address: 'Vinnytsia, Ukraine'
+  }
+]
 
 const ClientTable: React.FC = () => {
-  const [clients, setClients] = useState<Client[]>(initialData);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [form] = Form.useForm();
+  const [clients, setClients] = useState<Client[]>(initialData)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingClient, setEditingClient] = useState<Client | null>(null)
+  const [form] = Form.useForm()
 
   const handleEdit = (client: Client) => {
-    setEditingClient(client);
-    setIsModalOpen(true);
-    form.setFieldsValue(client); 
-  };
+    setEditingClient(client)
+    setIsModalOpen(true)
+    form.setFieldsValue(client) 
+  }
 
   const handleDelete = (key: string) => {
-    setClients(prev => prev.filter(client => client.key !== key));
-  };
+    setClients(prev => prev.filter(client => client.key !== key)) 
+  }
 
   const handleModalOk = () => {
     form.validateFields().then(values => {
@@ -77,46 +78,47 @@ const ClientTable: React.FC = () => {
           prev.map(client =>
             client.key === editingClient.key ? { ...editingClient, ...values } : client
           )
-        );
+        )
       } else {
         const newClient: Client = {
           key: Date.now().toString(),
-          ...values,
-        };
-        setClients(prev => [...prev, newClient]);
+          ...values
+        }
+        setClients(prev => [...prev, newClient])
       }
-      setIsModalOpen(false);
-      form.resetFields();
-      setEditingClient(null);
-    });
-  };
+
+      setIsModalOpen(false)
+      form.resetFields()
+      setEditingClient(null)
+    })
+  }
 
   const handleModalCancel = () => {
-    setIsModalOpen(false);
-    form.resetFields();
-    setEditingClient(null);
-  };
+    setIsModalOpen(false)
+    form.resetFields()
+    setEditingClient(null)
+  }
 
   const columns = [
     {
       title: 'First Name',
       dataIndex: 'firstName',
-      key: 'firstName',
+      key: 'firstName'
     },
     {
       title: 'Last Name',
       dataIndex: 'lastName',
-      key: 'lastName',
+      key: 'lastName'
     },
     {
       title: 'Age',
       dataIndex: 'age',
-      key: 'age',
+      key: 'age'
     },
     {
       title: 'Address',
       dataIndex: 'address',
-      key: 'address',
+      key: 'address'
     },
     {
       title: 'Actions',
@@ -124,32 +126,30 @@ const ClientTable: React.FC = () => {
       render: (_: any, record: Client) => (
         <Space>
           <Button type="link" onClick={() => handleEdit(record)}>Edit</Button>
-          <Button danger type="link" onClick={() => handleDelete(record.key)}>Delete</Button>
+          <Button type="link" danger onClick={() => handleDelete(record.key)}>Delete</Button>
         </Space>
-      ),
-    },
-  ];
+      )
+    }
+  ]
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="container">
       <Button
         type="primary"
-        style={{ marginBottom: '16px' }}
         onClick={() => {
           setEditingClient(null);
           form.resetFields();
           setIsModalOpen(true);
         }}
+        className="add-btn"
       >
         Add Client
       </Button>
-
-      <Table
-        dataSource={clients}
-        columns={columns}
-        pagination={{ pageSize: 3 }}
-      />
-
+  
+      <div className="table-wrapper">
+        <Table dataSource={clients} columns={columns} pagination={{ pageSize: 3 }} />
+      </div>
+  
       <Modal
         title={editingClient ? 'Edit Client' : 'Add Client'}
         open={isModalOpen}
@@ -157,19 +157,19 @@ const ClientTable: React.FC = () => {
         onCancel={handleModalCancel}
         okText="Save"
       >
-        <Form
-          form={form}
-          layout="vertical"
-        >
+        <Form form={form} layout="vertical" className="modal-form">
           <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
+  
           <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
+  
           <Form.Item name="age" label="Age" rules={[{ required: true }]}>
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
+  
           <Form.Item name="address" label="Address" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -177,6 +177,6 @@ const ClientTable: React.FC = () => {
       </Modal>
     </div>
   );
-};
+} 
 
-export default ClientTable;
+export default ClientTable
