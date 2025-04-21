@@ -1,10 +1,10 @@
-import EmployeeTable from './EmployeeTable';
+import ClientTable from './ClientTable';
 
 function App() {
   return (
     <div className="App">
       <h1>Список працівників</h1>
-      <EmployeeTable />
+      <ClientTable />
     </div>
   );
 }
