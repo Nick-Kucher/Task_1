@@ -19,16 +19,17 @@ const initialState: ClientState = {
   loading: false
 };
 
-export const fetchClients = createAsyncThunk('client/fetchClients', async () => {
-  const response = await axios.get('https://jsonplaceholder.typicode.com/users');
-  return response.data.map((user: any): Client => ({
-    key: user.id.toString(),
-    firstName: user.name.split(' ')[0],
-    lastName: user.name.split(' ')[1] || '',
-    age: Math.floor(Math.random() * 30) + 20,
-    address: `${user.address.city}, ${user.address.street}`,
-  }));
+export const fetchClients = createAsyncThunk('clients/fetchClients', async () => {
+  try {
+    const response = await axios.get('http://localhost:3001/clients');
+    console.log('Fetched clients:', response.data); 
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching clients:', error);
+    throw error;
+  }
 });
+
 
 const clientsSlice = createSlice({
   name: 'clients',

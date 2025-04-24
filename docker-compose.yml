@@ -1,0 +1,13 @@
+services:
+  react-app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - json-server
+
+  json-server:
+    build:
+      context: ./json-server
+    ports:
+      - "3001:3001"

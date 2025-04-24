@@ -1,0 +1,39 @@
+{
+  "clients": [
+    {
+      "key": "1",
+      "firstName": "John",
+      "lastName": "Doe",
+      "age": 28,
+      "address": "New York, 5th Avenue"
+    },
+    {
+      "key": "2",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "age": 32,
+      "address": "Los Angeles, Sunset Blvd"
+    },
+    {
+      "key": "3",
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "age": 24,
+      "address": "Chicago, Lakeshore Dr"
+    },
+    {
+      "key": "4",
+      "firstName": "Bob",
+      "lastName": "Williams",
+      "age": 35,
+      "address": "San Francisco, Market St"
+    },
+    {
+      "key": "5",
+      "firstName": "Emma",
+      "lastName": "Brown",
+      "age": 27,
+      "address": "Houston, Main St"
+    }
+  ]
+}

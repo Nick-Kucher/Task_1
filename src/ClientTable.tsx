@@ -7,6 +7,7 @@ import { fetchClients, addClient, updateClient, deleteClient } from './redux/cli
 const ClientTable: React.FC = () => {
   const dispatch = useAppDispatch();
   const clients = useAppSelector(state => state.clients.clients);  
+  console.log('clients:', clients);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<any | null>(null);
   const [form] = Form.useForm();
@@ -18,11 +19,11 @@ const ClientTable: React.FC = () => {
   const handleEdit = (client: any) => {
     setEditingClient(client);
     setIsModalOpen(true);
-    form.setFieldsValue(client);
+    form.setFieldsValue(client);  
   };
 
   const handleDelete = (key: string) => {
-    dispatch(deleteClient(key));
+    dispatch(deleteClient(key));  
   };
 
   const handleModalOk = () => {
